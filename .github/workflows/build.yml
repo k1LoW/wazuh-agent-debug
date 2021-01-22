@@ -1,0 +1,42 @@
+name: build
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  debug-build:
+    name: Build agent with patch
+    strategy:
+      matrix:
+        platform: [ubuntu-xenial]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install packages
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -qq git tar
+          curl -sL https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz -o ghr.tar.gz
+          sudo sh -c "tar xf ghr.tar.gz -O ghr_v0.13.0_linux_amd64/ghr > /usr/local/bin/ghr"
+          sudo chmod +x /usr/local/bin/ghr
+
+      - name: Check out source code
+        uses: actions/checkout@v2
+
+      - name: Make directory
+        run: |
+          mkdir dist
+          mkdir pkg
+
+      - name: Build agent with patch
+        run: |
+          docker build . -f Dockerfile.${{ matrix.platform }} -t wazuh-debug
+          docker run --rm -v $(pwd)/dist:/dist --env WAZUH_VERSION=${GITHUB_REF##*/} wazuh-debug
+
+      - name: Release
+        run: |
+          tar cfz pkg/wazuh-debug-${GITHUB_REF##*/}-${{ matrix.platform }}.tar.gz dist/
+          ghr -replace ${GITHUB_REF##*/} pkg/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

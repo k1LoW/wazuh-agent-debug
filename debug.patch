@@ -1,0 +1,13 @@
+diff --git a/src/client-agent/buffer.c b/src/client-agent/buffer.c
+index b3c0704d5..a20107d31 100644
+--- a/src/client-agent/buffer.c
++++ b/src/client-agent/buffer.c
+@@ -61,7 +61,7 @@ void buffer_init(){
+ 
+ /* Send messages to buffer. */
+ int buffer_append(const char *msg){
+-
++    mdebug2("Send messages to buffer: %s", msg);
+     w_mutex_lock(&mutex_lock);
+ 
+     /* Check if buffer usage reaches any higher level */
