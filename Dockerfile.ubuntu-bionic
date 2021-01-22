@@ -1,0 +1,11 @@
+FROM ubuntu:bionic
+ENV WAZUH_VERSION master
+RUN apt-get -qq update && \
+    apt-get install -qq gcc make debhelper dh-make clang git curl devscripts autoconf automake libtool
+RUN mkdir /workdir
+RUN mkdir /dist
+COPY build.sh /workdir/build.sh
+COPY debug.patch /workdir/debug.patch
+WORKDIR /workdir
+RUN chmod +x build.sh
+CMD ["bash", "/workdir/build.sh"]
