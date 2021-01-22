@@ -1,0 +1,11 @@
+FROM centos:7
+ENV WAZUH_VERSION master
+RUN yum update -y && \
+    yum install -y gcc make clang git curl devscripts autoconf automake libtool patch
+RUN mkdir /workdir
+RUN mkdir /dist
+COPY build.sh /workdir/build.sh
+COPY debug.patch /workdir/debug.patch
+WORKDIR /workdir
+RUN chmod +x build.sh
+CMD ["bash", "/workdir/build.sh"]

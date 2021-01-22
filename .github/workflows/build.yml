@@ -10,7 +10,7 @@ jobs:
     name: Build agent with patch
     strategy:
       matrix:
-        platform: [ubuntu-xenial, ubuntu-bionic]
+        platform: [ubuntu-xenial, ubuntu-bionic, centos-6, centos-7]
     runs-on: ubuntu-latest
     steps:
       - name: Install packages

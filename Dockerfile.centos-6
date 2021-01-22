@@ -1,0 +1,21 @@
+FROM centos:6.10
+ENV WAZUH_VERSION master
+
+RUN sed -i "s|#baseurl=|baseurl=|g" /etc/yum.repos.d/CentOS-Base.repo \
+  && sed -i "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-Base.repo \
+  && sed -i "s|http://mirror\.centos\.org/centos/\$releasever|https://vault\.centos\.org/6.10|g" /etc/yum.repos.d/CentOS-Base.repo
+
+RUN yum update -y && \
+    yum install -y gcc make clang curl devscripts autoconf automake libtool patch
+
+
+RUN curl -sL https://repo.ius.io/ius-archive-6.repo -o /etc/yum.repos.d/ius-archive-6.repo && \
+    yum install -y --enablerepo=ius-archive git216
+
+RUN mkdir /workdir
+RUN mkdir /dist
+COPY build.sh /workdir/build.sh
+COPY debug.patch /workdir/debug.patch
+WORKDIR /workdir
+RUN chmod +x build.sh
+CMD ["bash", "/workdir/build.sh"]
